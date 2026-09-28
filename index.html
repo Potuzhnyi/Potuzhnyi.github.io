@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Море Кави — Вибір закладу</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #f8f9fa);
+            --text-color: var(--tg-theme-text-color, #2c3e50);
+            --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+            --primary-color: #f5b041;
+            --accent-color: #3390ec;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px;
+            box-sizing: border-box;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin: 0 0 4px 0;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #888;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--text-color);
+        }
+
+        .shop-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 2px solid transparent;
+        }
+
+        .shop-card:active {
+            transform: scale(0.98);
+        }
+
+        .shop-info {
+            flex: 1;
+            padding-right: 12px;
+        }
+
+        .shop-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 0 0 4px 0;
+        }
+
+        .shop-rating {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .stars {
+            color: #f39c12;
+        }
+
+        .shop-address {
+            font-size: 14px;
+            color: #555;
+            margin: 0 0 6px 0;
+        }
+
+        .shop-status {
+            font-size: 12px;
+            font-weight: 600;
+            color: #27ae60;
+        }
+
+        .shop-img {
+            width: 76px;
+            height: 76px;
+            border-radius: 12px;
+            object-fit: cover;
+            background-color: #eee;
+        }
+
+        .menu-container {
+            display: none;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-name {
+            font-size: 14px;
+            font-weight: bold;
+            margin: 0 0 4px 0;
+        }
+
+        .product-price {
+            font-size: 14px;
+            color: #e67e22;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .btn-order {
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ЕКРАН 1: Вибір магазину -->
+    <div id="shops-screen">
+        <div class="header">
+            <h1>☕️ Море Кави</h1>
+            <p>Оберіть найближчий заклад для замовлення</p>
+        </div>
+
+        <div class="section-title">Наші кав'ярні в Одесі:</div>
+
+        <!-- Картка 1: Філатова -->
+        <div class="shop-card" onclick="selectShop('вул. Академіка Філатова, 54')">
+            <div class="shop-info">
+                <div class="shop-title">Море Кави</div>
+                <div class="shop-rating"><span class="stars">⭐ 5.0</span> (5 відгуків)</div>
+                <div class="shop-address">вул. Академіка Філатова, 54</div>
+                <div class="shop-status">🟢 Відчинено • До 20:00</div>
+            </div>
+            <img src="logo_more_kavy.png" class="shop-img" alt="Кав'ярня">
+        </div>
+
+        <!-- Картка 2: Єврейська -->
+        <div class="shop-card" onclick="selectShop('Єврейська вулиця, 53')">
+            <div class="shop-info">
+                <div class="shop-title">Море Кави</div>
+                <div class="shop-rating"><span class="stars">⭐ 4.8</span> (12 відгуків)</div>
+                <div class="shop-address">Єврейська вулиця, 53</div>
+                <div class="shop-status">🟢 Відчинено • До 20:00</div>
+            </div>
+            <img src="logo_more_kavy.png" class="shop-img" alt="Кав'ярня">
+        </div>
+
+        <!-- Картка 3: Незалежності -->
+        <div class="shop-card" onclick="selectShop('вул. Незалежності, 9')">
+            <div class="shop-info">
+                <div class="shop-title">Море Кави</div>
+                <div class="shop-rating"><span class="stars">⭐ 5.0</span> (6 відгуків)</div>
+                <div class="shop-address">вул. Незалежності, 9</div>
+                <div class="shop-status">🟢 Відчинено • До 20:00</div>
+            </div>
+            <img src="logo_more_kavy.png" class="shop-img" alt="Кав'ярня">
+        </div>
+    </div>
+
+    <!-- ЕКРАН 2: Меню обраного закладу -->
+    <div id="menu-screen" class="menu-container">
+        <button class="back-btn" onclick="goBack()">← Назад до вибору закладу</button>
+        <div class="header">
+            <h1 id="selected-shop-title">Море Кави</h1>
+            <p id="selected-shop-address">Адреса</p>
+        </div>
+
+        <div class="section-title">Популярні напої:</div>
+        
+        <div class="product-grid">
+            <div class="product-card">
+                <div>
+                    <div class="product-name">Капучино</div>
+                    <div style="font-size: 12px; color: #888;">Стандарт</div>
+                </div>
+                <div>
+                    <div class="product-price">40 ₴</div>
+                    <button class="btn-order" onclick="sendOrder('Капучино')">+ Додати</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div>
+                    <div class="product-name">Лате Солона Карамель</div>
+                    <div style="font-size: 12px; color: #888;">Не стандарт</div>
+                </div>
+                <div>
+                    <div class="product-price">60 ₴</div>
+                    <button class="btn-order" onclick="sendOrder('Лате Солона Карамель')">+ Додати</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div>
+                    <div class="product-name">Еспресо</div>
+                    <div style="font-size: 12px; color: #888;">Стандарт</div>
+                </div>
+                <div>
+                    <div class="product-price">30 ₴</div>
+                    <button class="btn-order" onclick="sendOrder('Еспресо')">+ Додати</button>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div>
+                    <div class="product-name">Флет Вайт</div>
+                    <div style="font-size: 12px; color: #888;">Стандарт</div>
+                </div>
+                <div>
+                    <div class="product-price">50 ₴</div>
+                    <button class="btn-order" onclick="sendOrder('Флет Вайт')">+ Додати</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let currentShop = "";
+
+        function selectShop(shopAddress) {
+            currentShop = shopAddress;
+            document.getElementById('shops-screen').style.display = 'none';
+            document.getElementById('menu-screen').style.display = 'block';
+            document.getElementById('selected-shop-address').innerText = shopAddress;
+        }
+
+        function goBack() {
+            document.getElementById('menu-screen').style.display = 'none';
+            document.getElementById('shops-screen').style.display = 'block';
+        }
+
+        function sendOrder(item) {
+            let orderData = JSON.stringify({ shop: currentShop, product: item });
+            tg.sendData(orderData);
+        }
+    </script>
+</body>
+</html>
