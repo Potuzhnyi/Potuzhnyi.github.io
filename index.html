@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Море Кави Меню</title>
+    <!-- Підключаємо скрипт самого Телеграму, щоб сторінка з ним спілкувалась -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 20px;
+            text-align: center;
+        }
+        .item {
+            background-color: var(--tg-theme-secondary-bg-color, #f1f1f1);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+        .btn {
+            background-color: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>☕️ Море Кави</h2>
+    <p>вул. Академіка Філатова, 54</p>
+
+    <div class="item">
+        <h3>Капучино (Стандарт)</h3>
+        <p>Ціна: 40 ₴</p>
+        <button class="btn" onclick="sendOrder('Капучино за 40 ₴')">Замовити</button>
+    </div>
+    
+    <div class="item">
+        <h3>Лате Солона Карамель</h3>
+        <p>Ціна: 60 ₴</p>
+        <button class="btn" onclick="sendOrder('Лате Солона Карамель за 60 ₴')">Замовити</button>
+    </div>
+
+    <script>
+        // Ініціалізуємо WebApp
+        let tg = window.Telegram.WebApp;
+        tg.expand(); // Розгортає меню на весь екран
+
+        // Функція відправки даних назад у бота
+        function sendOrder(item) {
+            tg.sendData(item); 
+        }
+    </script>
+</body>
+</html>
