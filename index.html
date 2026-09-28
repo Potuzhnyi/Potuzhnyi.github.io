@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Море Кави | Маркетплейс</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --primary: #3b6ea5; 
+            --primary-hover: #2a527c;
+            --bg-color: #f2f4f7;
+            --card-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #757575;
+            --border-color: #e0e0e0;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            padding-bottom: 30px;
+        }
+
+        .screen { display: none; animation: fadeIn 0.3s ease; }
+        .screen.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* ГОЛОВНА ШАПКА (Як на маркетплейсі) */
+        .top-nav {
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-left { display: flex; align-items: center; gap: 10px; }
+        .nav-logo { width: 36px; height: 36px; object-fit: contain; border-radius: 8px; }
+        .nav-title { font-size: 18px; font-weight: 800; color: var(--primary); margin: 0; }
+        
+        .nav-cart-btn {
+            position: relative;
+            background: rgba(59, 110, 165, 0.1);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+        .cart-badge {
+            background: var(--primary);
+            color: #fff;
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 10px;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            display: none;
+        }
+
+        /* КНОПКА НАЗАД (Тільки для екрану кошика) */
+        .back-bar {
+            background: var(--card-bg);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .btn-back {
+            background: none; border: none;
+            color: var(--primary); font-size: 15px; font-weight: 600;
+            cursor: pointer; padding: 0;
+        }
+
+        .container { padding: 16px; }
+        .section-header { font-size: 18px; font-weight: 700; margin: 0 0 16px 0; }
+
+        /* КАРТКИ ЗАКЛАДІВ */
+        .shop-list { display: flex; flex-direction: column; gap: 12px; }
+        .shop-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .shop-card:active { border-color: var(--primary); transform: scale(0.98); }
+        .shop-info h3 { margin: 0 0 4px 0; font-size: 16px; }
+        .shop-info p { margin: 0; font-size: 13px; color: var(--text-muted); }
+        .status-open { color: #27ae60; font-size: 12px; font-weight: 600; margin-top: 6px; display: block; }
+
+        /* КАТЕГОРІЇ (Скрол) */
+        .categories {
+            display: flex; gap: 8px; overflow-x: auto;
+            padding: 0 16px 12px 16px; margin-top: 12px;
+            scrollbar-width: none;
+        }
+        .categories::-webkit-scrollbar { display: none; }
+        .cat-item {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px; font-weight: 600;
+            white-space: nowrap; color: var(--text-main);
+        }
+        .cat-item.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+
+        /* СІТКА ТОВАРІВ (Маркетплейс стиль) */
+        .marketplace-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 0 16px;
+        }
+        .product-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .product-img-wrap {
+            width: 100%;
+            aspect-ratio: 1;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .product-img-wrap img { width: 60%; height: 60%; object-fit: contain; opacity: 0.9; }
+        
+        .product-title { font-size: 14px; font-weight: 600; margin: 0 0 4px 0; line-height: 1.2; height: 34px; overflow: hidden; }
+        .product-price { font-size: 18px; font-weight: 800; color: var(--text-main); margin-bottom: 12px; }
+        
+        .btn-add-cart {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            display: flex; justify-content: center; align-items: center; gap: 6px;
+            cursor: pointer;
+        }
+        .btn-add-cart:active { background: var(--primary-hover); }
+        .btn-add-cart.added { background: #27ae60; } /* Зелена, якщо додано */
+
+        /* ЕКРАН КОШИКА */
+        .cart-list { display: flex; flex-direction: column; gap: 12px; }
+        .cart-item {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .cart-item-info h4 { margin: 0 0 4px 0; font-size: 15px; }
+        .cart-item-info p { margin: 0; font-weight: 800; color: var(--primary); }
+        
+        .qty-controls { display: flex; align-items: center; gap: 12px; }
+        .qty-btn {
+            background: var(--bg-color); border: none;
+            width: 32px; height: 32px; border-radius: 8px;
+            font-size: 18px; font-weight: bold; color: var(--text-main);
+        }
+
+        .empty-cart { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+    </style>
+</head>
+<body>
+
+    <!-- ЗАГАЛЬНА ШАПКА ДЛЯ КАТАЛОГУ -->
+    <div class="top-nav" id="main-nav">
+        <div class="nav-left" onclick="showScreen('shops-screen')">
+            <img src="logo_more_kavy.png" class="nav-logo" alt="Лого">
+            <h1 class="nav-title">Море Кави</h1>
+        </div>
+        <button class="nav-cart-btn" onclick="showScreen('cart-screen')">
+            🛒 Кошик
+            <span class="cart-badge" id="top-cart-badge">0</span>
+        </button>
+    </div>
+
+    <!-- ЕКРАН 1: ВИБІР ЗАКЛАДУ -->
+    <div id="shops-screen" class="screen active">
+        <div class="container">
+            <h2 class="section-header">Виберіть кав'ярню</h2>
+            <div class="shop-list">
+                <div class="shop-card" onclick="selectShop('Академіка Філатова, 54')">
+                    <div class="shop-info">
+                        <h3>вул. Академіка Філатова, 54</h3>
+                        <p>Одеса</p>
+                        <span class="status-open">Відчинено до 20:00</span>
+                    </div>
+                    <div style="color:var(--text-muted)">›</div>
+                </div>
+
+                <div class="shop-card" onclick="selectShop('Єврейська вулиця, 53')">
+                    <div class="shop-info">
+                        <h3>Єврейська вулиця, 53</h3>
+                        <p>Одеса</p>
+                        <span class="status-open">Відчинено до 20:00</span>
+                    </div>
+                    <div style="color:var(--text-muted)">›</div>
+                </div>
+
+                <div class="shop-card" onclick="selectShop('вул. Незалежності, 9')">
+                    <div class="shop-info">
+                        <h3>вул. Незалежності, 9</h3>
+                        <p>Одеса</p>
+                        <span class="status-open">Відчинено до 20:00</span>
+                    </div>
+                    <div style="color:var(--text-muted)">›</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЕКРАН 2: МАРКЕТПЛЕЙС (Меню) -->
+    <div id="menu-screen" class="screen">
+        <div style="padding: 12px 16px 0; font-size: 13px; color: var(--text-muted);">
+            📍 Вибрано: <strong style="color:var(--text-main)" id="shop-name-display">Адреса</strong>
+        </div>
+
+        <div class="categories">
+            <div class="cat-item active">Всі напої</div>
+            <div class="cat-item">Класика ☕️</div>
+            <div class="cat-item">Авторські 🍹</div>
+        </div>
+
+        <div class="marketplace-grid">
+            <!-- Товар 1 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-wrap">
+                        <img src="logo_more_kavy.png" alt="Капучино">
+                    </div>
+                    <h3 class="product-title">Капучино (Стандарт)</h3>
+                    <div class="product-price">40 ₴</div>
+                </div>
+                <button class="btn-add-cart" id="btn-Капучино" onclick="addToCart('Капучино', 40, this)">
+                    🛒 Купити
+                </button>
+            </div>
+
+            <!-- Товар 2 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-wrap">
+                        <img src="logo_more_kavy.png" alt="Лате">
+                    </div>
+                    <h3 class="product-title">Лате Солона Карамель</h3>
+                    <div class="product-price">60 ₴</div>
+                </div>
+                <button class="btn-add-cart" id="btn-Лате Карамель" onclick="addToCart('Лате Карамель', 60, this)">
+                    🛒 Купити
+                </button>
+            </div>
+
+            <!-- Товар 3 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-wrap">
+                        <img src="logo_more_kavy.png" alt="Флет Вайт">
+                    </div>
+                    <h3 class="product-title">Флет Вайт (Подвійний)</h3>
+                    <div class="product-price">50 ₴</div>
+                </div>
+                <button class="btn-add-cart" id="btn-Флет Вайт" onclick="addToCart('Флет Вайт', 50, this)">
+                    🛒 Купити
+                </button>
+            </div>
+
+            <!-- Товар 4 -->
+            <div class="product-card">
+                <div>
+                    <div class="product-img-wrap">
+                        <img src="logo_more_kavy.png" alt="Еспресо">
+                    </div>
+                    <h3 class="product-title">Еспресо 100% Арабіка</h3>
+                    <div class="product-price">30 ₴</div>
+                </div>
+                <button class="btn-add-cart" id="btn-Еспресо" onclick="addToCart('Еспресо', 30, this)">
+                    🛒 Купити
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ЕКРАН 3: КОШИК -->
+    <div id="cart-screen" class="screen">
+        <div class="back-bar">
+            <button class="btn-back" onclick="showScreen(currentShop ? 'menu-screen' : 'shops-screen')">
+                ← До покупок
+            </button>
+        </div>
+        
+        <div class="container">
+            <h2 class="section-header">Ваш кошик</h2>
+            <div id="cart-items-container" class="cart-list">
+                <!-- Товари рендеряться тут -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        // Налаштовуємо нативну кнопку ТГ для оформлення
+        tg.MainButton.color = "#3b6ea5";
+        tg.MainButton.textColor = "#ffffff";
+
+        let currentShop = "";
+        let cart = {};
+
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            window.scrollTo(0, 0);
+            
+            // Керування шапкою
+            if(screenId === 'cart-screen') {
+                document.getElementById('main-nav').style.display = 'none';
+                renderCart();
+            } else {
+                document.getElementById('main-nav').style.display = 'flex';
+            }
+
+            updateMainButton();
+        }
+
+        function selectShop(address) {
+            tg.HapticFeedback.impactOccurred('light');
+            currentShop = address;
+            document.getElementById('shop-name-display').innerText = address;
+            showScreen('menu-screen');
+        }
+
+        function addToCart(name, price, btnElement) {
+            tg.HapticFeedback.impactOccurred('medium');
+            
+            if (!cart[name]) {
+                cart[name] = { price: price, count: 1 };
+            } else {
+                cart[name].count += 1;
+            }
+            
+            // Анімація кнопки (робимо зеленою на секунду)
+            btnElement.classList.add('added');
+            btnElement.innerHTML = '✓ В кошику';
+            setTimeout(() => {
+                btnElement.classList.remove('added');
+                btnElement.innerHTML = '🛒 Купити';
+            }, 1000);
+
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+            for (let item in cart) {
+                totalCount += cart[item].count;
+                totalPrice += cart[item].count * cart[item].price;
+            }
+
+            let badge = document.getElementById('top-cart-badge');
+            if (totalCount > 0) {
+                badge.style.display = 'block';
+                badge.innerText = totalCount;
+            } else {
+                badge.style.display = 'none';
+            }
+            
+            updateMainButton(totalCount, totalPrice);
+        }
+
+        function updateMainButton(totalCount = null, totalPrice = null) {
+            if (totalCount === null) {
+                totalCount = 0; totalPrice = 0;
+                for (let item in cart) {
+                    totalCount += cart[item].count;
+                    totalPrice += cart[item].count * cart[item].price;
+                }
+            }
+
+            // Показуємо кнопку оплати ТІЛЬКИ на екрані кошика, якщо є товари
+            if (document.getElementById('cart-screen').classList.contains('active') && totalCount > 0) {
+                tg.MainButton.setText(`ОФОРМИТИ ЗАМОВЛЕННЯ (${totalPrice} ₴)`);
+                tg.MainButton.show();
+                tg.MainButton.onClick(checkout);
+            } else {
+                tg.MainButton.hide();
+                tg.MainButton.offClick(checkout);
+            }
+        }
+
+        function renderCart() {
+            let container = document.getElementById('cart-items-container');
+            container.innerHTML = '';
+            let totalCount = 0;
+            
+            for (let name in cart) {
+                totalCount += cart[name].count;
+                container.innerHTML += `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <h4>${name}</h4>
+                            <p>${cart[name].price * cart[name].count} ₴</p>
+                        </div>
+                        <div class="qty-controls">
+                            <button class="qty-btn" onclick="changeQty('${name}', -1)">-</button>
+                            <span style="font-weight:700; font-size:16px; width: 20px; text-align:center;">${cart[name].count}</span>
+                            <button class="qty-btn" onclick="changeQty('${name}', 1)">+</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if(totalCount === 0) {
+                container.innerHTML = `<div class="empty-cart"><h3>Кошик порожній 😔</h3><p>Додайте смачну каву з меню!</p></div>`;
+            }
+        }
+
+        function changeQty(name, delta) {
+            tg.HapticFeedback.impactOccurred('light');
+            cart[name].count += delta;
+            if (cart[name].count <= 0) delete cart[name];
+            updateCartUI();
+            renderCart();
+        }
+
+        function checkout() {
+            tg.HapticFeedback.notificationOccurred('success');
+            let orderData = { shop: currentShop, items: cart };
+            tg.sendData(JSON.stringify(orderData));
+        }
+    </script>
+</body>
+</html>
