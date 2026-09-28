@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Море Кави — Преміум доставка</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #f4f6f8);
+            --text-color: var(--tg-theme-text-color, #1a1a1a);
+            --card-bg: var(--tg-theme-secondary-bg-color, #ffffff);
+            --accent: #2f80ed;
+            --accent-gradient: linear-gradient(135deg, #355c7d, #6c5b7b, #c06c84);
+            --success: #27ae60;
+            --badge-bg: rgba(47, 128, 237, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 16px 16px 90px 16px;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--card-bg);
+            padding: 14px 18px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+        }
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            object-fit: cover;
+        }
+
+        .brand-title h1 {
+            font-size: 18px;
+            font-weight: 700;
+            margin: 0 0 2px 0;
+        }
+
+        .brand-title p {
+            font-size: 12px;
+            color: #888;
+            margin: 0;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin: 16px 0 12px 4px;
+            letter-spacing: -0.2px;
+        }
+
+        /* Картки магазинів */
+        .shop-card {
+            background-color: var(--card-bg);
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(0,0,0,0.04);
+        }
+
+        .shop-card:active {
+            transform: scale(0.98);
+        }
+
+        .shop-info {
+            flex: 1;
+            padding-right: 12px;
+        }
+
+        .shop-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0 0 4px 0;
+        }
+
+        .shop-meta {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .stars {
+            color: #f39c12;
+            font-weight: 600;
+        }
+
+        .shop-address {
+            font-size: 13px;
+            color: #444;
+            margin: 0 0 8px 0;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--success);
+            background: rgba(39, 174, 96, 0.1);
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background-color: var(--success);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.8; }
+        }
+
+        .shop-thumb {
+            width: 72px;
+            height: 72px;
+            border-radius: 14px;
+            object-fit: cover;
+        }
+
+        /* Меню та товари */
+        .menu-container {
+            display: none;
+        }
+
+        .back-btn {
+            background: var(--card-bg);
+            border: none;
+            color: var(--accent);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .product-card {
+            background-color: var(--card-bg);
+            border-radius: 18px;
+            padding: 14px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+        .product-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0 0 2px 0;
+        }
+
+        .product-desc {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .product-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+        }
+
+        .product-price {
+            font-size: 15px;
+            font-weight: 800;
+            color: #e67e22;
+        }
+
+        .add-btn {
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(47, 128, 237, 0.3);
+        }
+
+        /* Фіксована панель кошика знизу */
+        .cart-bar {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            background: #111;
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            cursor: pointer;
+            transform: translateY(120%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+        }
+
+        .cart-bar.visible {
+            transform: translateY(0);
+        }
+
+        .cart-info {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .cart-total {
+            font-size: 16px;
+            font-weight: 800;
+            color: #f5b041;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ЕКРАН 1: Вибір магазину -->
+    <div id="shops-screen">
+        <div class="brand-header">
+            <img src="logo_more_kavy.png" class="brand-logo" alt="Лого">
+            <div class="brand-title">
+                <h1>Море Кави</h1>
+                <p>Мережа кав'ярень в Одесі</p>
+            </div>
+        </div>
+
+        <div class="section-title">Оберіть зручну локацію:</div>
+
+        <!-- Картка 1: Філатова -->
+        <div class="shop-card" onclick="selectShop('вул. Академіка Філатова, 54')">
+            <div class="shop-info">
+                <div class="shop-name">Море Кави</div>
+                <div class="shop-meta">
+                    <span class="stars">⭐ 5.0</span> <span>(5 відгуків)</span>
+                </div>
+                <div class="shop-address">вул. Академіка Філатова, 54</div>
+                <div class="status-badge"><span class="status-dot"></span> Відчинено • До 20:00</div>
+            </div>
+            <img src="logo_more_kavy.png" class="shop-thumb" alt="Філатова">
+        </div>
+
+        <!-- Картка 2: Єврейська -->
+        <div class="shop-card" onclick="selectShop('Єврейська вулиця, 53')">
+            <div class="shop-info">
+                <div class="shop-name">Море Кави</div>
+                <div class="shop-meta">
+                    <span class="stars">⭐ 4.8</span> <span>(12 відгуків)</span>[cite: 13]
+                </div>
+                <div class="shop-address">Єврейська вулиця, 53</div>[cite: 13]
+                <div class="status-badge"><span class="status-dot"></span> Відчинено • До 20:00</div>[cite: 13]
+            </div>
+            <img src="logo_more_kavy.png" class="shop-thumb" alt="Єврейська">
+        </div>
+
+        <!-- Картка 3: Незалежності -->
+        <div class="shop-card" onclick="selectShop('вул. Незалежності, 9')">
+            <div class="shop-info">
+                <div class="shop-name">Море Кави</div>
+                <div class="shop-meta">
+                    <span class="stars">⭐ 5.0</span> <span>(6 відгуків)</span>[cite: 12]
+                </div>
+                <div class="shop-address">вул. Незалежності, 9</div>[cite: 12]
+                <div class="status-badge"><span class="status-dot"></span> Відчинено • До 20:00</div>[cite: 12]
+            </div>
+            <img src="logo_more_kavy.png" class="shop-thumb" alt="Незалежності">
+        </div>
+    </div>
+
+    <!-- ЕКРАН 2: Меню закладу -->
+    <div id="menu-screen" class="menu-container">
+        <button class="back-btn" onclick="goBack()">← Назад до локацій</button>
+        <div class="brand-header">
+            <img src="logo_more_kavy.png" class="brand-logo" alt="Лого">
+            <div class="brand-title">
+                <h1 id="selected-shop-title">Море Кави</h1>
+                <p id="selected-shop-address">Адреса</p>
+            </div>
+        </div>
+
+        <div class="section-title">Картка напоїв:</div>
+        
+        <div class="product-grid">
+            <div class="product-card">
+                <div>
+                    <div class="product-name">Капучино</div>
+                    <div class="product-desc">Класичний мастхев</div>
+                </div>
+                <div>
+                    <div class="product-footer">
+                        <span class="product-price">40 ₴</span>
+                        <button class="add-btn" onclick="addToCart('Капучино', 40)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div>
+                    <div class="product-name">Лате Карамель</div>
+                    <div class="product-desc">Солодкий ніжний смак</div>
+                </div>
+                <div>
+                    <div class="product-footer">
+                        <span class="product-price">60 ₴</span>
+                        <button class="add-btn" onclick="addToCart('Лате Солона Карамель', 60)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div>
+                    <div class="product-name">Еспресо</div>
+                    <div class="product-desc">Міцне та насичене</div>
+                </div>
+                <div>
+                    <div class="product-footer">
+                        <span class="product-price">30 ₴</span>
+                        <button class="add-btn" onclick="addToCart('Еспресо', 30)">+</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div>
+                    <div class="product-name">Флет Вайт</div>
+                    <div class="product-desc">Подвійний ристрето</div>
+                </div>
+                <div>
+                    <div class="product-footer">
+                        <span class="product-price">50 ₴</span>
+                        <button class="add-btn" onclick="addToCart('Флет Вайт', 50)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Плаваюча кнопка оформлення -->
+    <div id="cart-bar" class="cart-bar" onclick="checkout()">
+        <div class="cart-info" id="cart-text">Кошик порожній</div>
+        <div class="cart-total" id="cart-sum">0 ₴</div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+
+        let currentShop = "";
+        let cart = {};
+
+        function selectShop(shopAddress) {
+            currentShop = shopAddress;
+            document.getElementById('shops-screen').style.display = 'none';
+            document.getElementById('menu-screen').style.display = 'block';
+            document.getElementById('selected-shop-address').innerText = shopAddress;
+        }
+
+        function goBack() {
+            document.getElementById('menu-screen').style.display = 'none';
+            document.getElementById('shops-screen').style.display = 'block';
+        }
+
+        function addToCart(productName, price) {
+            if (!cart[productName]) {
+                cart[productName] = { count: 0, price: price };
+            }
+            cart[productName].count += 1;
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            let totalCount = 0;
+            let totalPrice = 0;
+
+            for (let item in cart) {
+                totalCount += cart[item].count;
+                totalPrice += cart[item].count * cart[item].price;
+            }
+
+            let cartBar = document.getElementById('cart-bar');
+            if (totalCount > 0) {
+                cartBar.classList.add('visible');
+                document.getElementById('cart-text').innerText = `Обрано товарів: ${totalCount}`;
+                document.getElementById('cart-sum').innerText = `${totalPrice} ₴`;
+            } else {
+                cartBar.classList.remove('visible');
+            }
+        }
+
+        function checkout() {
+            let orderData = {
+                shop: currentShop,
+                items: cart
+            };
+            tg.sendData(JSON.stringify(orderData));
+        }
+    </script>
+</body>
+</html>
